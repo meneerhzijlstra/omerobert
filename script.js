@@ -33,6 +33,14 @@ const questions = [
         answer: "Chromatografie",
         explanation: "De kleurstoffen bewegen verschillend over het papier."
     }
+    const methods = [
+    "Filtreren",
+    "Indampen",
+    "Destilleren",
+    "Magnetische scheiding",
+    "Bezinken",
+    "Chromatografie"
+];
 ];
 
 // ------------------------
@@ -104,7 +112,67 @@ shuffleQuestions();
 // ------------------------
 // VRAAG LADEN
 // ------------------------
+function renderMethods() {
 
+    const container =
+        document.getElementById(
+            "methodsContainer"
+        );
+
+    container.innerHTML = "";
+
+    const shuffledMethods =
+        shuffleArray(methods);
+
+    shuffledMethods.forEach(method => {
+
+        const div =
+            document.createElement("div");
+
+        div.classList.add("method");
+
+        div.draggable = true;
+
+        div.dataset.method = method;
+
+        div.textContent = method;
+
+        div.addEventListener(
+            "dragstart",
+            () => {
+
+                if (gameLocked) return;
+
+                draggedMethod =
+                    method;
+            }
+        );
+
+        container.appendChild(div);
+
+    });
+}
+function shuffleArray(array) {
+
+    const shuffled = [...array];
+
+    for (
+        let i = shuffled.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() * (i + 1)
+            );
+
+        [shuffled[i], shuffled[j]] =
+            [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled;
+}
 function loadQuestion() {
 
     questionElement.textContent =
@@ -133,37 +201,23 @@ function restartGame() {
     scoreElement.textContent =
         "Score: 0";
 
-    shuffleQuestions();
-
-    loadQuestion();
+shuffleQuestions();
+renderMethods();
+loadQuestion();
 }
 
 // ------------------------
 // START
 // ------------------------
 
+shuffleQuestions();
+renderMethods();
 loadQuestion();
 
 // ------------------------
 // DRAG START
 // ------------------------
 
-document
-.querySelectorAll(".method")
-.forEach(method => {
-
-    method.addEventListener(
-        "dragstart",
-        () => {
-
-            if (gameLocked) return;
-
-            draggedMethod =
-                method.dataset.method;
-        }
-    );
-
-});
 
 // ------------------------
 // DROP ZONE
