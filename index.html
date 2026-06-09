@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scheidingsmethoden Oefenen</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<h1>Scheidingsmethoden Oefenen</h1>
+
+<div id="score">Score: 0</div>
+
+<div class="game-container">
+
+    <div class="question-box">
+        <h2>Mengsel</h2>
+        <div id="question"></div>
+    </div>
+
+    <div class="methods-box">
+        <h2>Sleep de juiste methode</h2>
+
+        <div class="method" draggable="true" data-method="Filtreren">
+            Filtreren
+        </div>
+
+        <div class="method" draggable="true" data-method="Indampen">
+            Indampen
+        </div>
+
+        <div class="method" draggable="true" data-method="Destilleren">
+            Destilleren
+        </div>
+
+        <div class="method" draggable="true" data-method="Magnetische scheiding">
+            Magnetische scheiding
+        </div>
+
+        <div class="method" draggable="true" data-method="Bezinken">
+            Bezinken
+        </div>
+
+        <div class="method" draggable="true" data-method="Chromatografie">
+            Chromatografie
+        </div>
+
+    </div>
+
+    <div class="drop-zone" id="dropZone">
+        Sleep hierheen
+    </div>
+
+</div>
+
+<div id="feedback"></div>
+
+<button id="nextBtn">Volgende vraag</button>
+
+<script src="script.js"></script>
+
+</body>
+</html>
