@@ -34,11 +34,13 @@ const questions = [
 let currentQuestion = 0;
 let score = 0;
 let draggedMethod = "";
+let gameLocked = false;
 
 const questionElement = document.getElementById("question");
 const feedbackElement = document.getElementById("feedback");
 const scoreElement = document.getElementById("score");
 const dropZone = document.getElementById("dropZone");
+const nextBtn = document.getElementById("nextBtn");
 
 function loadQuestion() {
 
@@ -48,8 +50,11 @@ function loadQuestion() {
     feedbackElement.textContent = "";
 
     dropZone.textContent = "Sleep hierheen";
+
     dropZone.classList.remove("correct");
     dropZone.classList.remove("wrong");
+
+    gameLocked = false;
 }
 
 loadQuestion();
@@ -57,6 +62,9 @@ loadQuestion();
 document.querySelectorAll(".method").forEach(method => {
 
     method.addEventListener("dragstart", () => {
+
+        if (gameLocked) return;
+
         draggedMethod = method.dataset.method;
     });
 
@@ -68,67 +76,76 @@ dropZone.addEventListener("dragover", (e) => {
 
 dropZone.addEventListener("drop", () => {
 
+    if (gameLocked) return;
+
+    gameLocked = true;
+
     const correctAnswer =
         questions[currentQuestion].answer;
 
-if (draggedMethod === correctAnswer) {
+    if (draggedMethod === correctAnswer) {
 
-    score += 10;
+        score += 10;
 
-    dropZone.classList.add("correct");
+        scoreElement.textContent =
+            "Score: " + score;
 
-    feedbackElement.innerHTML =
-        "✅ Goed! " +
-        questions[currentQuestion].explanation;
+        dropZone.classList.add("correct");
 
-    scoreElement.textContent = "Score: " + score;
+        feedbackElement.innerHTML =
+            "✅ Goed! " +
+            questions[currentQuestion].explanation;
 
-    setTimeout(() => {
+        setTimeout(() => {
 
-        currentQuestion++;
+            currentQuestion++;
 
-        if (currentQuestion >= questions.length) {
+            if (currentQuestion >= questions.length) {
+
+                alert(
+                    "🎉 Geweldig!\n\n" +
+                    "Je hebt alle vragen goed beantwoord!\n\n" +
+                    "Eindscore: " + score + " punten."
+                );
+
+                currentQuestion = 0;
+                score = 0;
+
+                scoreElement.textContent =
+                    "Score: 0";
+            }
+
+            loadQuestion();
+
+        }, 1500);
+
+    } else {
+
+        dropZone.classList.add("wrong");
+
+        setTimeout(() => {
 
             alert(
-                "🎉 Geweldig!\n\n" +
-                "Je hebt alle vragen goed beantwoord.\n\n" +
-                "Eindscore: " + score + " punten."
+                "❌ Helaas!\n\n" +
+                "Je antwoord was fout.\n\n" +
+                "Behaalde score: " +
+                score +
+                " punten.\n\n" +
+                "Je begint opnieuw."
             );
 
             currentQuestion = 0;
             score = 0;
 
-            scoreElement.textContent = "Score: 0";
-        }
+            scoreElement.textContent =
+                "Score: 0";
 
-        loadQuestion();
+            loadQuestion();
 
-    }, 1500);
-
-}
-
-});
-
-document
-.getElementById("nextBtn")
-.addEventListener("click", () => {
-
-    currentQuestion++;
-
-    if (currentQuestion >= questions.length) {
-
-        alert(
-            "Klaar! Eindscore: " +
-            score +
-            " punten."
-        );
-
-        currentQuestion = 0;
-        score = 0;
-
-        scoreElement.textContent = "Score: 0";
+        }, 500);
     }
-
-    loadQuestion();
-
 });
+
+if (nextBtn) {
+    nextBtn.style.display = "none";
+}
