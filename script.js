@@ -1,39 +1,19 @@
-// ------------------------
+// ---------------------
 // VRAGEN
-// ------------------------
-
+// ---------------------
 const questions = [
-    {
-        mixture: "Zand + water",
-        answer: "Filtreren",
-        explanation: "Zanddeeltjes zijn groter dan de gaatjes van het filter."
-    },
-    {
-        mixture: "Zout + water",
-        answer: "Indampen",
-        explanation: "Water verdampt en het zout blijft achter."
-    },
-    {
-        mixture: "Alcohol + water",
-        answer: "Destilleren",
-        explanation: "Alcohol heeft een lager kookpunt dan water."
-    },
-    {
-        mixture: "IJzervijlsel + zand",
-        answer: "Magnetische scheiding",
-        explanation: "IJzer wordt aangetrokken door een magneet."
-    },
-    {
-        mixture: "Olie + water",
-        answer: "Bezinken",
-        explanation: "De vloeistoffen vormen twee lagen."
-    },
-    {
-        mixture: "Inkt",
-        answer: "Chromatografie",
-        explanation: "De kleurstoffen bewegen verschillend over het papier."
-    }
-    const methods = [
+    { mixture: "Zand + water", answer: "Filtreren", explanation: "Zand is niet opgelost en blijft achter." },
+    { mixture: "Zout + water", answer: "Indampen", explanation: "Water verdampt, zout blijft over." },
+    { mixture: "Alcohol + water", answer: "Destilleren", explanation: "Verschil in kookpunt." },
+    { mixture: "IJzervijlsel + zand", answer: "Magnetische scheiding", explanation: "IJzer is magnetisch." },
+    { mixture: "Olie + water", answer: "Bezinken", explanation: "Twee lagen door verschil in dichtheid." },
+    { mixture: "Inkt", answer: "Chromatografie", explanation: "Kleurstoffen bewegen verschillend." }
+];
+
+// ---------------------
+// METHODES
+// ---------------------
+const methods = [
     "Filtreren",
     "Indampen",
     "Destilleren",
@@ -41,307 +21,148 @@ const questions = [
     "Bezinken",
     "Chromatografie"
 ];
-];
 
-// ------------------------
+// ---------------------
 // VARIABELEN
-// ------------------------
-
+// ---------------------
 let currentQuestion = 0;
 let score = 0;
 let draggedMethod = "";
 let gameLocked = false;
 
-// Persoonlijk record ophalen
-let record = localStorage.getItem("record");
+let record = Number(localStorage.getItem("record")) || 0;
 
-if (record === null) {
-    record = 0;
-} else {
-    record = Number(record);
-}
+// ---------------------
+// ELEMENTEN
+// ---------------------
+const questionEl = document.getElementById("question");
+const feedbackEl = document.getElementById("feedback");
+const scoreEl = document.getElementById("score");
+const recordEl = document.getElementById("record");
+const dropZone = document.getElementById("dropZone");
 
-// ------------------------
-// HTML ELEMENTEN
-// ------------------------
-
-const questionElement =
-    document.getElementById("question");
-
-const feedbackElement =
-    document.getElementById("feedback");
-
-const scoreElement =
-    document.getElementById("score");
-
-const recordElement =
-    document.getElementById("record");
-
-const dropZone =
-    document.getElementById("dropZone");
-
-// ------------------------
+// ---------------------
 // RECORD TONEN
-// ------------------------
+// ---------------------
+recordEl.textContent = "Record: " + record;
 
-recordElement.textContent =
-    "Record: " + record;
-
-// ------------------------
-// VRAGEN SCHUDDEN
-// ------------------------
-
-function shuffleQuestions() {
-
-    for (
-        let i = questions.length - 1;
-        i > 0;
-        i--
-    ) {
-
-        const j =
-            Math.floor(Math.random() * (i + 1));
-
-        [questions[i], questions[j]] =
-            [questions[j], questions[i]];
+// ---------------------
+// SHUFFLE FUNCTIE
+// ---------------------
+function shuffle(array) {
+    let arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
     }
+    return arr;
 }
 
-shuffleQuestions();
-
-// ------------------------
-// VRAAG LADEN
-// ------------------------
+// ---------------------
+// METHODES RENDEREN
+// ---------------------
 function renderMethods() {
-
-    const container =
-        document.getElementById(
-            "methodsContainer"
-        );
-
+    const container = document.getElementById("methodsContainer");
     container.innerHTML = "";
 
-    const shuffledMethods =
-        shuffleArray(methods);
+    const shuffled = shuffle(methods);
 
-    shuffledMethods.forEach(method => {
-
-        const div =
-            document.createElement("div");
-
+    shuffled.forEach(m => {
+        const div = document.createElement("div");
         div.classList.add("method");
-
+        div.textContent = m;
+        div.dataset.method = m;
         div.draggable = true;
 
-        div.dataset.method = method;
-
-        div.textContent = method;
-
-        div.addEventListener(
-            "dragstart",
-            () => {
-
-                if (gameLocked) return;
-
-                draggedMethod =
-                    method;
-            }
-        );
+        div.addEventListener("dragstart", () => {
+            if (gameLocked) return;
+            draggedMethod = m;
+        });
 
         container.appendChild(div);
-
     });
 }
-function shuffleArray(array) {
 
-    const shuffled = [...array];
-
-    for (
-        let i = shuffled.length - 1;
-        i > 0;
-        i--
-    ) {
-
-        const j =
-            Math.floor(
-                Math.random() * (i + 1)
-            );
-
-        [shuffled[i], shuffled[j]] =
-            [shuffled[j], shuffled[i]];
-    }
-
-    return shuffled;
-}
+// ---------------------
+// VRAAG LADEN
+// ---------------------
 function loadQuestion() {
-
-    questionElement.textContent =
-        questions[currentQuestion].mixture;
-
-    feedbackElement.textContent = "";
-
-    dropZone.textContent =
-        "Sleep hierheen";
-
-    dropZone.classList.remove("correct");
-    dropZone.classList.remove("wrong");
-
+    questionEl.textContent = questions[currentQuestion].mixture;
+    feedbackEl.textContent = "";
+    dropZone.textContent = "Sleep hierheen";
+    dropZone.className = "drop-zone";
     gameLocked = false;
 }
 
-// ------------------------
-// SPEL HERSTARTEN
-// ------------------------
-
+// ---------------------
+// SPEL RESET
+// ---------------------
 function restartGame() {
-
     currentQuestion = 0;
     score = 0;
-
-    scoreElement.textContent =
-        "Score: 0";
-
-shuffleQuestions();
-renderMethods();
-loadQuestion();
+    scoreEl.textContent = "Score: 0";
+    renderMethods();
+    loadQuestion();
 }
 
-// ------------------------
+// ---------------------
 // START
-// ------------------------
-
-shuffleQuestions();
+// ---------------------
+let shuffledQuestions = shuffle(questions);
 renderMethods();
 loadQuestion();
 
-// ------------------------
-// DRAG START
-// ------------------------
+// ---------------------
+// DROP
+// ---------------------
+dropZone.addEventListener("dragover", e => e.preventDefault());
 
+dropZone.addEventListener("drop", () => {
 
-// ------------------------
-// DROP ZONE
-// ------------------------
+    if (gameLocked) return;
+    gameLocked = true;
 
-dropZone.addEventListener(
-    "dragover",
-    (e) => {
-        e.preventDefault();
-    }
-);
+    const correct = questions[currentQuestion].answer;
 
-dropZone.addEventListener(
-    "drop",
-    () => {
+    if (draggedMethod === correct) {
 
-        if (gameLocked) return;
+        score += 10;
+        scoreEl.textContent = "Score: " + score;
 
-        gameLocked = true;
+        if (score > record) {
+            record = score;
+            localStorage.setItem("record", record);
+            recordEl.textContent = "Record: " + record;
+        }
 
-        const correctAnswer =
-            questions[currentQuestion].answer;
+        dropZone.classList.add("correct");
 
-        // ------------------------
-        // GOED ANTWOORD
-        // ------------------------
+        feedbackEl.innerHTML =
+            "✅ Goed! " + questions[currentQuestion].explanation;
 
-        if (
-            draggedMethod ===
-            correctAnswer
-        ) {
+        setTimeout(() => {
+            currentQuestion++;
 
-            score += 10;
-
-            scoreElement.textContent =
-                "Score: " + score;
-
-            // Nieuw record?
-
-            if (score > record) {
-
-                record = score;
-
-                localStorage.setItem(
-                    "record",
-                    record
-                );
-
-                recordElement.textContent =
-                    "Record: " + record;
+            if (currentQuestion >= questions.length) {
+                alert("🎉 Alles goed! Score: " + score);
+                restartGame();
+                return;
             }
 
-            dropZone.classList.add(
-                "correct"
+            loadQuestion();
+        }, 1200);
+
+    } else {
+
+        dropZone.classList.add("wrong");
+
+        setTimeout(() => {
+            alert(
+                "❌ Fout!\n\nScore: " + score +
+                "\nRecord: " + record +
+                "\n\nJe begint opnieuw."
             );
-
-            feedbackElement.innerHTML =
-                "✅ Goed! " +
-                questions[currentQuestion]
-                .explanation;
-
-            setTimeout(() => {
-
-                currentQuestion++;
-
-                // ------------------------
-                // ALLE VRAGEN GOED
-                // ------------------------
-
-                if (
-                    currentQuestion >=
-                    questions.length
-                ) {
-
-                    alert(
-                        "🎉 Geweldig!\n\n" +
-                        "Je hebt alle vragen goed beantwoord!\n\n" +
-                        "Eindscore: " +
-                        score +
-                        " punten.\n\n" +
-                        "Record: " +
-                        record +
-                        " punten."
-                    );
-
-                    restartGame();
-                    return;
-                }
-
-                loadQuestion();
-
-            }, 1500);
-
-        }
-
-        // ------------------------
-        // FOUT ANTWOORD
-        // ------------------------
-
-        else {
-
-            dropZone.classList.add(
-                "wrong"
-            );
-
-            setTimeout(() => {
-
-                alert(
-                    "❌ Helaas!\n\n" +
-                    "Je antwoord was fout.\n\n" +
-                    "Behaalde score: " +
-                    score +
-                    " punten.\n\n" +
-                    "Persoonlijk record: " +
-                    record +
-                    " punten.\n\n" +
-                    "Je begint opnieuw."
-                );
-
-                restartGame();
-
-            }, 500);
-
-        }
-
+            restartGame();
+        }, 300);
     }
-);
+});
