@@ -71,27 +71,41 @@ dropZone.addEventListener("drop", () => {
     const correctAnswer =
         questions[currentQuestion].answer;
 
-    if (draggedMethod === correctAnswer) {
+if (draggedMethod === correctAnswer) {
 
-        score += 10;
+    score += 10;
 
-        dropZone.classList.add("correct");
+    dropZone.classList.add("correct");
 
-        feedbackElement.innerHTML =
-            "✅ Goed! " +
-            questions[currentQuestion].explanation;
-
-    } else {
-
-        dropZone.classList.add("wrong");
-
-        feedbackElement.innerHTML =
-            "❌ Fout. Het juiste antwoord is: <strong>" +
-            correctAnswer +
-            "</strong>";
-    }
+    feedbackElement.innerHTML =
+        "✅ Goed! " +
+        questions[currentQuestion].explanation;
 
     scoreElement.textContent = "Score: " + score;
+
+    setTimeout(() => {
+
+        currentQuestion++;
+
+        if (currentQuestion >= questions.length) {
+
+            alert(
+                "🎉 Geweldig!\n\n" +
+                "Je hebt alle vragen goed beantwoord.\n\n" +
+                "Eindscore: " + score + " punten."
+            );
+
+            currentQuestion = 0;
+            score = 0;
+
+            scoreElement.textContent = "Score: 0";
+        }
+
+        loadQuestion();
+
+    }, 1500);
+
+}
 
 });
 
